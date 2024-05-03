@@ -5,7 +5,7 @@ class Carga:
         self.x = x
         self.y = y
         self.signo = signo
-        self.valorCarga=1.609e-19 * signo
+        self.valorCarga=1e-9 * signo
 
     def Valor(self):
         return self.valorCarga

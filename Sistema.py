@@ -38,21 +38,15 @@ class Sistema:
 
             # Obtener la distancia a la carga
             distancia = self.distancia((x, y), posicion_carga)
-
+            
             # Obtener la magnitud del campo eléctrico con Ley de Coulomb
             try:
                 E  = k * carga.Valor() / (distancia ** 2)
             except ZeroDivisionError:
-                return False
+                return [0, 0]
             
             # Calcular los componentes del vector de campo
             vector_campo[0] += E * (carga.X() - x)
             vector_campo[1] += E * (carga.Y() - y)
-
-            # #Normalizar el vector
-            # magnitud = self.distancia((0,0), vector_campo)
-            # if magnitud != 0:
-            #     vector_campo[0] /= magnitud
-            #     vector_campo[1] /= magnitud
 
         return vector_campo
