@@ -128,7 +128,7 @@ class Window(tk.Tk):
 
                 # Dibujar el campo eléctrico
                 vector = self.canvas.create_line(x, y, x + v[0], y + v[1],
-                    fill="white", arrow=tk.LAST,width=4)
+                    fill="white", arrow=tk.LAST,width=4,capstyle=tk.ROUND,joinstyle=tk.BEVEL)
 
                 self.canvas.addtag_withtag("campo", vector)
 
@@ -158,7 +158,7 @@ class Window(tk.Tk):
 
                 self.canvas.create_line(carga.X(), carga.Y(), carga.X() + E[0]*300000.0, carga.Y() + E[1]*300000.0,
                     fill="red", tags="vectorSensor", arrow=tk.LAST,width=2)
-                self.canvas.create_text(carga.X()+60,carga.Y()-6,text="E="+str(round((E[0]**2+E[1]**2)**(1/2),7)),font=("Arial",10),fill='red',tags="magnitudCampo")
+                self.canvas.create_text(carga.X()+75,carga.Y()-6,text="E="+str(round((E[0]**2+E[1]**2)**(1/2),7))+" V/m",font=("Arial",10),fill='red',tags="magnitudCampo")
     def dibujar_equipotenciales(self):
         pass        
 
