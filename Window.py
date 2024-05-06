@@ -13,9 +13,9 @@ class Window(tk.Tk):
         self.title("Simulador de campo eléctrico")
 
         # Configuración de la ventana
-        self.resizable(False, False)
+        self.resizable(True, True)
         self.config_width = 800
-        self.config_height = 600
+        self.config_height = 800
 
         # Configuracion de las opciones de visualización
         self.mostrar_lineas_campo = tk.BooleanVar()
@@ -24,9 +24,9 @@ class Window(tk.Tk):
 
         # Cargar cargas por defecto
         self.sistema = Sistema.Sistema()
-        q1 = Carga.Carga(100, 300, 1)
+        q1 = Carga.Carga(100, 400, 1)
         self.sistema.agregarCarga(q1)
-        q2 = Carga.Carga(700, 300, -1)
+        q2 = Carga.Carga(700, 400, -1)
         self.sistema.agregarCarga(q2)
         
         # Crear el canvas para dibujar las cargas
@@ -58,8 +58,8 @@ class Window(tk.Tk):
         self.canvas.bind("<ButtonRelease-1>", self.deseleccionar_carga)
 
         # Empaqueta los widgets en la ventana
-        self.canvas.pack(side=tk.LEFT)
-        self.panel.pack(side=tk.RIGHT)
+        self.canvas.grid(row=0, column=0)
+        self.panel.grid(row=0, column=1)
 
         self.update()
 
@@ -88,10 +88,6 @@ class Window(tk.Tk):
         self.sistema.agregarCarga(s)
         self.refrescar_cargas()
         self.click_mode = None
-
-    
-    # eliminar carga si se da click derecho en una carga
-
     
     def moverCarga(self):
         # Obtener posición del mouse
@@ -110,13 +106,10 @@ class Window(tk.Tk):
             carga.asignarX(self.canvas.coords(carga.obtenerId())[0] + self.radio)
             carga.asignarY(self.canvas.coords(carga.obtenerId())[1] + self.radio)
 
-    def dibujarEquipotenciales(self):
-        pass
-
     # ********** Visualización **********
     
     def mostrar_campo(self, sistema):
-        vectores_separacion = 50
+        vectores_separacion = 40
 
         # Dibujar los vectores del campo eléctrico
         for i in range(self.config_width // vectores_separacion):
@@ -128,7 +121,7 @@ class Window(tk.Tk):
                 v = self.sistema.campoElectrico(x, y)
 
                 # Normalizar el vector
-                magnitud = self.sistema.distancia([0, 0], v)/30
+                magnitud = self.sistema.distancia([0, 0], v)/25
                 if magnitud != 0:
                     v[0] /= magnitud
                     v[1] /= magnitud
@@ -164,6 +157,9 @@ class Window(tk.Tk):
 
                 self.canvas.create_line(carga.X(), carga.Y(), carga.X() + E[0], carga.Y() + E[1],
                     fill="yellow", tags="vectorSensor", arrow=tk.LAST)
+
+    def dibujar_equipotenciales(self):
+        pass        
 
     def refrescar_campo(self):
         self.canvas.delete("campo")
@@ -202,9 +198,7 @@ class Window(tk.Tk):
         
         self.refrescar_cargas()
 
-
     def actualizarSistema(self):
-
         self.moverCarga()
         self.mostrar_vector_sensor()
 
