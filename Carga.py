@@ -6,6 +6,7 @@ class Carga:
         self.y = y
         self.signo = signo
         self.valorCarga=1e-9 * signo
+        self.id = None
 
     def Valor(self):
         return self.valorCarga
@@ -18,3 +19,15 @@ class Carga:
     
     def Signo(self):
         return self.signo
+    
+    def obtenerId(self):
+        return self.id
+    
+    def asignarId(self, id):
+        self.id = id
+
+    def asignarX(self, x):
+        self.x = x
+    
+    def asignarY(self, y):
+        self.y = y
