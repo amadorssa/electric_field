@@ -41,12 +41,12 @@ class Sistema:
             
             # Obtener la magnitud del campo eléctrico con Ley de Coulomb
             try:
-                E  = k * carga.Valor() / (distancia ** 2)
+                E  = k * carga.Valor() / (distancia ** 3)
             except ZeroDivisionError:
                 return [0, 0]
             
             # Calcular los componentes del vector de campo
-            vector_campo[0] += E * (carga.X() - x)
-            vector_campo[1] += E * (carga.Y() - y)
+            vector_campo[0] += E * (x-carga.X())
+            vector_campo[1] += E * (y-carga.Y())
 
         return vector_campo

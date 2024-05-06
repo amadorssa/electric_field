@@ -150,13 +150,13 @@ class Window(tk.Tk):
             self.canvas.addtag_withtag("carga", p)
 
     def mostrar_vector_sensor(self):
-        #self.canvas.delete("vectorSensor")
+        self.canvas.delete("vectorSensor")
         for carga in self.sistema.obtenerCargas():
             if carga.Signo() == 0:
                 E = self.sistema.campoElectrico(carga.X(), carga.Y())
 
-                self.canvas.create_line(carga.X(), carga.Y(), carga.X() + E[0], carga.Y() + E[1],
-                    fill="yellow", tags="vectorSensor", arrow=tk.LAST)
+                self.canvas.create_line(carga.X(), carga.Y(), carga.X() + E[0]*300000.0, carga.Y() + E[1]*300000.0,
+                    fill="red", tags="vectorSensor", arrow=tk.LAST)
 
     def dibujar_equipotenciales(self):
         pass        
