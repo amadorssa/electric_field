@@ -180,16 +180,18 @@ class Window(tk.Tk):
     def mostrar_vector_sensor(self):
         self.canvas.delete("vectorSensor")
         self.canvas.delete("magnitudCampo")
+        self.canvas.delete("potencialCampo")
         for carga in self.sistema.obtenerCargas():
             if carga.Signo() == 0:
                 E = self.sistema.campoElectrico(carga.X(), carga.Y())
-
-                magnitudCampo = self.sistema.distancia([0, 0], E)
-
+                V=self.sistema.potencialElectrico(carga.X(),carga.Y())
                 self.canvas.create_line(carga.X(), carga.Y(), carga.X() + E[0]*300000.0, carga.Y() + E[1]*300000.0,
+
                                         fill="red", tags="vectorSensor", arrow=tk.LAST,width=2)
-                self.canvas.create_text(carga.X() + 75, carga.Y() - 6, text="E={:.7f} V/m".format(magnitudCampo), font=("Arial", 10), fill='red', tags="magnitudCampo")
                 
+                self.canvas.create_text(carga.X() + 75, carga.Y() - 6, text="E={:.7f} V/m".format(magnitudCampo), font=("Arial", 10), fill='red', tags="magnitudCampo")
+                self.canvas.create_text(carga.X()+75,carga.Y()+10,text="V="+str(round(V,7))+" V",font=("Arial",10),fill='red',tags="potencialCampo")
+
     def dibujar_equipotenciales(self):
         pass        
 
