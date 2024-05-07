@@ -36,7 +36,7 @@ class Window(tk.Tk):
         # Crear panel lateral
         self.panel = panel_lateral(self.sistema, 
             (self.mostrar_lineas_campo, self.mostrar_equipotenciales), 
-            (self.cargaPositiva, self.cargaNegativa, self.sensor),
+            (self.cargaPositiva, self.cargaNegativa, self.sensor, self.limpiar_sistema),
             self, bd=0, highlightthickness=0)
         
         # Configuracion predeterminada de visualización
@@ -103,8 +103,10 @@ class Window(tk.Tk):
 
         # Actualizar coordenadas de las cargas
         for carga in self.sistema.obtenerCargas():            
-            carga.asignarX(self.canvas.coords(carga.obtenerId())[0] + self.radio)
-            carga.asignarY(self.canvas.coords(carga.obtenerId())[1] + self.radio)
+            id = carga.obtenerId()
+            if id in self.canvas.find_all():
+                carga.asignarX(self.canvas.coords(carga.obtenerId())[0] + self.radio)
+                carga.asignarY(self.canvas.coords(carga.obtenerId())[1] + self.radio)
 
     # ********** Visualización **********
     
@@ -161,8 +163,14 @@ class Window(tk.Tk):
                 self.canvas.create_line(carga.X(), carga.Y(), carga.X() + E[0]*300000.0, carga.Y() + E[1]*300000.0,
                     fill="red", tags="vectorSensor", arrow=tk.LAST,width=2)
                 self.canvas.create_text(carga.X() + 75, carga.Y() - 6, text="E={:.7f} V/m".format(magnitudCampo), font=("Arial", 10), fill='red', tags="magnitudCampo")
+    
     def dibujar_equipotenciales(self):
         pass        
+
+    def limpiar_sistema(self):
+        for carga in self.sistema.obtenerCargas():
+            self.sistema.eliminarCarga(carga)
+        self.refrescar_cargas()
 
     def refrescar_campo(self):
         self.canvas.delete("campo")
@@ -202,8 +210,11 @@ class Window(tk.Tk):
         self.refrescar_cargas()
 
     def actualizarSistema(self):
+        
+        #if self.sistema.obtenerCargas():
         self.moverCarga()
         self.mostrar_vector_sensor()
+
 
         # Actualizar campo eléctrico
         self.canvas.delete("campo")
@@ -232,6 +243,7 @@ class panel_lateral(tk.Frame):
         self.btn_positiva = tk.Button(self, text="Agregar carga positiva", command=botones[0])
         self.btn_negativa = tk.Button(self, text="Agregar carga negativa", command=botones[1])
         self.btn_sensor = tk.Button(self, text="Agregar sensor", command=botones[2])
+        self.btn_limpiar = tk.Button(self, text="Limpiar sistema", command=botones[3])
 
         self.x_etiqueta.grid(row=0, column=0)
         self.y_etiqueta.grid(row=0, column=1)
@@ -241,6 +253,7 @@ class panel_lateral(tk.Frame):
         self.btn_positiva.grid(row=4, column=0, columnspan=2)
         self.btn_negativa.grid(row=5, column=0, columnspan=2)
         self.btn_sensor.grid(row=6, column=0, columnspan=2)
+        self.btn_limpiar.grid(row=7, column=0, columnspan=2)
 
         self.campo = campo
 
@@ -250,4 +263,4 @@ class panel_lateral(tk.Frame):
 
         campo = self.campo.campoElectrico(mov.x, mov.y)
 
-        self.campo_etiqueta_str.set("Campo eléctrico: {}")
+        self.campo_etiqueta_str.set("Campo eléctrico: {}".format(campo))
