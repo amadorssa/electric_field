@@ -189,7 +189,7 @@ class Window(tk.Tk):
 
                                         fill="red", tags="vectorSensor", arrow=tk.LAST,width=2)
                 
-                self.canvas.create_text(carga.X() + 75, carga.Y() - 6, text="E={:.7f} V/m".format(magnitudCampo), font=("Arial", 10), fill='red', tags="magnitudCampo")
+                self.canvas.create_text(carga.X()+75,carga.Y()-6,text="E="+str(round((E[0]**2+E[1]**2)**(1/2),7))+" V/m",font=("Arial",10),fill='red',tags="magnitudCampo")
                 self.canvas.create_text(carga.X()+75,carga.Y()+10,text="V="+str(round(V,7))+" V",font=("Arial",10),fill='red',tags="potencialCampo")
 
     def dibujar_equipotenciales(self):
