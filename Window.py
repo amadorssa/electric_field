@@ -31,13 +31,13 @@ class Window(tk.Tk):
         
         # Crear el canvas para dibujar las cargas
         self.canvas = tk.Canvas(self, width=self.config_width, height=self.config_height,
-            bg='black')
+                                bg='black')
         
         # Crear panel lateral
         self.panel = panel_lateral(self.sistema, 
-            (self.mostrar_lineas_campo, self.mostrar_equipotenciales), 
-            (self.cargaPositiva, self.cargaNegativa, self.sensor, self.limpiar_sistema),
-            self, bd=0, highlightthickness=0)
+                                   (self.mostrar_lineas_campo, self.mostrar_equipotenciales), 
+                                   (self.cargaPositiva, self.cargaNegativa, self.sensor, self.limpiar_sistema),
+                                   self, bd=0, highlightthickness=0)
         
         # Configuracion predeterminada de visualización
         self.mostrar_lineas_campo.set(True)
@@ -88,7 +88,7 @@ class Window(tk.Tk):
         self.sistema.agregarCarga(s)
         self.refrescar_cargas()
         self.click_mode = None
-    
+        
     def moverCarga(self):
         # Obtener posición del mouse
         mouse_x = self.winfo_pointerx() - self.winfo_rootx()
@@ -98,8 +98,8 @@ class Window(tk.Tk):
             carga_seleccionada_coord = self.canvas.coords(self.carga_seleccionada)
 
             self.canvas.move(self.carga_seleccionada, 
-                mouse_x - self.radio - carga_seleccionada_coord[0],
-                mouse_y - self.radio - carga_seleccionada_coord[1])
+                             mouse_x - self.radio - carga_seleccionada_coord[0],
+                             mouse_y - self.radio - carga_seleccionada_coord[1])
 
         # Actualizar coordenadas de las cargas
         for carga in self.sistema.obtenerCargas():            
@@ -113,26 +113,52 @@ class Window(tk.Tk):
     def mostrar_campo(self, sistema):
         vectores_separacion = 40
 
-        # Dibujar los vectores del campo eléctrico
+        magnitudes = []
+        # Para guardar las magnitudes.
         for i in range(self.config_width // vectores_separacion):
             for j in range(self.config_height // vectores_separacion):
+                x = i * vectores_separacion
+                y = j * vectores_separacion
+                v = self.sistema.campoElectrico(x, y)
 
+                # Guardamos las magnitudes
+                magnitud = self.sistema.distancia([0, 0], v)/25
+                magnitudes.append(magnitud)
+                        
+    
+        # Ordenamos las magnitudes de menor a mayor.
+        magnitudes.sort()
+
+        for i in range(self.config_width // vectores_separacion):
+            for j in range(self.config_height // vectores_separacion):
                 x = i * vectores_separacion
                 y = j * vectores_separacion
 
                 v = self.sistema.campoElectrico(x, y)
 
-                # Normalizar el vector
+                # Normalizamos el vector
                 magnitud = self.sistema.distancia([0, 0], v)/25
                 if magnitud != 0:
                     v[0] /= magnitud
                     v[1] /= magnitud
+                    
+                match magnitud:
+                    case magnitud if(magnitud <= magnitudes[int(len(magnitudes)/4)]):
+                        color = "white"
+                    case magnitud if(magnitudes[int(len(magnitudes)/4)] < magnitud <= magnitudes[int(2*len(magnitudes)/4)]):
+                        color = "yellow"
+                    case magnitud if(magnitudes[int(2*len(magnitudes)/4)] < magnitud <= magnitudes[int(3*len(magnitudes)/4)]):
+                        color = "orange"
+                    case _:
+                        color = "red"
 
-                # Dibujar el campo eléctrico
                 vector = self.canvas.create_line(x, y, x + v[0], y + v[1],
-                    fill="white", arrow=tk.LAST,width=4,capstyle=tk.ROUND,joinstyle=tk.BEVEL)
+                                                 fill=color, arrow=tk.LAST,width=4,capstyle=tk.ROUND,joinstyle=tk.BEVEL)
 
                 self.canvas.addtag_withtag("campo", vector)
+
+
+
 
     def mostrar_cargas(self, sistema):
         for carga in self.sistema.obtenerCargas():
@@ -145,7 +171,7 @@ class Window(tk.Tk):
 
             # Dibujar la carga
             p = self.canvas.create_oval(carga.X() - self.radio, carga.Y() - self.radio,
-                carga.X() + self.radio, carga.Y() + self.radio, outline=color, fill=color)
+                                        carga.X() + self.radio, carga.Y() + self.radio, outline=color, fill=color)
             
             carga.asignarId(p)
 
@@ -161,16 +187,16 @@ class Window(tk.Tk):
                 magnitudCampo = self.sistema.distancia([0, 0], E)
 
                 self.canvas.create_line(carga.X(), carga.Y(), carga.X() + E[0]*300000.0, carga.Y() + E[1]*300000.0,
-                    fill="red", tags="vectorSensor", arrow=tk.LAST,width=2)
+                                        fill="red", tags="vectorSensor", arrow=tk.LAST,width=2)
                 self.canvas.create_text(carga.X() + 75, carga.Y() - 6, text="E={:.7f} V/m".format(magnitudCampo), font=("Arial", 10), fill='red', tags="magnitudCampo")
-    
+                
     def dibujar_equipotenciales(self):
         pass        
 
     def limpiar_sistema(self):
         for carga in self.sistema.obtenerCargas():
             self.sistema.eliminarCarga(carga)
-        self.refrescar_cargas()
+            self.refrescar_cargas()
 
     def refrescar_campo(self):
         self.canvas.delete("campo")
@@ -188,7 +214,7 @@ class Window(tk.Tk):
         for carga in self.sistema.obtenerCargas():
             self.canvas.tag_bind(carga.obtenerId(), "<Button-1>", self.seleccionar_carga)
             self.canvas.tag_bind(carga.obtenerId(), "<Button-2>", self.eliminar_carga)
-           
+            
     def seleccionar_carga(self, event):
         q = self.canvas.find_withtag(tk.CURRENT)[0]
         self.carga_seleccionada = q
@@ -196,7 +222,7 @@ class Window(tk.Tk):
     def deseleccionar_carga(self, event):
         if self.carga_seleccionada is not None:
             self.carga_seleccionada = None
-        
+            
         self.click_mode = None
 
     def eliminar_carga(self, event):
@@ -206,7 +232,7 @@ class Window(tk.Tk):
             if carga.obtenerId() == q:
                 self.sistema.eliminarCarga(carga)
                 break
-        
+            
         self.refrescar_cargas()
 
     def actualizarSistema(self):
@@ -238,7 +264,7 @@ class panel_lateral(tk.Frame):
         self.campo_etiqueta = tk.Label(self, textvariable=self.campo_etiqueta_str, width=30)
 
         self.campo_casilla = tk.Checkbutton(self, text="Campo electrico", variable = casillas[0])
-        self.equipotenciales_casillas = tk.Checkbutton(self, text="Lineas equipotenciales", variable = casillas[1])
+        # self.equipotenciales_casillas = tk.Checkbutton(self, text="Lineas equipotenciales", variable = casillas[1])
 
         self.btn_positiva = tk.Button(self, text="Agregar carga positiva", command=botones[0])
         self.btn_negativa = tk.Button(self, text="Agregar carga negativa", command=botones[1])
@@ -249,7 +275,7 @@ class panel_lateral(tk.Frame):
         self.y_etiqueta.grid(row=0, column=1)
         self.campo_etiqueta.grid(row=1, column=0, columnspan=2)
         self.campo_casilla.grid(row=2, column=0, columnspan=2)
-        self.equipotenciales_casillas.grid(row=3, column=0, columnspan=2)
+        # self.equipotenciales_casillas.grid(row=3, column=0, columnspan=2)
         self.btn_positiva.grid(row=4, column=0, columnspan=2)
         self.btn_negativa.grid(row=5, column=0, columnspan=2)
         self.btn_sensor.grid(row=6, column=0, columnspan=2)
