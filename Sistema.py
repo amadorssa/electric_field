@@ -37,7 +37,7 @@ class Sistema:
             distancia=self.distancia((x,y),posicion_carga)
 
             try:
-                valorPotencial  = k * carga.Valor() / (distancia)
+                valorPotencial  += k * carga.Valor() / (distancia)
             except ZeroDivisionError:
                 return 0
             
