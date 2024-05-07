@@ -24,6 +24,26 @@ class Sistema:
     
     # Se encarga de actualizar el conjunto de vectores unitarios en función
     # del conjunto de cargas que existen. 
+
+    def potencialElectrico(self,x,y,k=9e9):
+        valorPotencial=0
+
+        for carga in self.cargas:
+            if carga.Signo()== 0:
+                continue
+
+            posicion_carga=(carga.X(),carga.Y())
+
+            distancia=self.distancia((x,y),posicion_carga)
+
+            try:
+                valorPotencial  = k * carga.Valor() / (distancia)
+            except ZeroDivisionError:
+                return 0
+            
+        return valorPotencial
+            
+
     def campoElectrico(self, x, y, k=9e9):
         # Vector de campo eléctrico (i, j)
         vector_campo = [0, 0]
